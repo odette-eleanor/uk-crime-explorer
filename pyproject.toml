@@ -1,0 +1,24 @@
+[project]
+name = "uk-crime-explorer"
+version = "0.1.0"
+description = "UK crime data explorer - EDA, clustering, and Streamlit dashboard"
+authors = [
+    {name = "ouou",email = "odette.eleanor11@gmail.com"}
+]
+requires-python = ">=3.14"
+dependencies = [
+    "requests (>=2.34.2,<3.0.0)",
+    "pandas (>=3.0.3,<4.0.0)",
+    "matplotlib (>=3.11.0,<4.0.0)",
+    "seaborn (>=0.13.2,<0.14.0)",
+    "scikit-learn (>=1.9.0,<2.0.0)",
+    "streamlit (>=1.58.0,<2.0.0)",
+    "folium (>=0.20.0,<0.21.0)",
+    "streamlit-folium (>=0.27.2,<0.28.0)",
+    "notebook (>=7.6.0,<8.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
