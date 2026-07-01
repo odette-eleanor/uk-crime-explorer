@@ -2,7 +2,8 @@
 
 An end-to-end data science project exploring street-level crime patterns across Leeds using real UK Police data.
 
-**[🚀 Live Demo](YOUR_STREAMLIT_URL_HERE)** · **[📊 Data Source](https://data.police.uk)**
+**[🚀 Live Demo](https://uk-crime-explorer-yghy4cftsjoohguzgzmckx.streamlit.app)**
+**[📊 Data Source](https://data.police.uk)**
 
 ![Dashboard Preview](data/chart_clusters.png)
 
