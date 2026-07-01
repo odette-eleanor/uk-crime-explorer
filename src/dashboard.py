@@ -86,10 +86,8 @@ def load_data() -> pd.DataFrame:
 df_full = load_data()
 
 # ── Sidebar filters ───────────────────────────────────────────────────────────
-st.sidebar.image(
-    "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Flag_of_the_United_Kingdom.svg/320px-Flag_of_the_United_Kingdom.svg.png",
-    width=120,
-)
+st.sidebar.markdown("## 🇬🇧 UK Crime Explorer")
+st.sidebar.markdown("---")
 st.sidebar.title("Filters")
 
 # Crime category filter
