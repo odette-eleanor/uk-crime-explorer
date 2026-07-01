@@ -15,6 +15,52 @@ st.set_page_config(
 
 DATA_PATH = Path("data/crimes_clustered.csv")
 
+LAT = 53.7996
+LNG = -1.5491
+MONTHS = [
+    "2024-01", "2024-02", "2024-03", "2024-04",
+    "2024-05", "2024-06", "2024-07", "2024-08",
+    "2024-09", "2024-10", "2024-11", "2024-12",
+]
+BASE_URL = "https://data.police.uk/api/crimes-street/all-crime"
+
+
+def fetch_and_cluster() -> pd.DataFrame:
+    """Fetch from API and run clustering — used when CSV doesn't exist."""
+    import requests
+    from sklearn.cluster import KMeans
+    from sklearn.preprocessing import StandardScaler
+
+    all_records = []
+    for month in MONTHS:
+        r = requests.get(BASE_URL, params={"lat": LAT, "lng": LNG, "date": month}, timeout=30)
+        if r.status_code == 200:
+            all_records.extend(r.json())
+
+    df = pd.DataFrame(all_records)
+
+    # Flatten nested columns
+    df["latitude"] = df["location"].apply(lambda x: float(x["latitude"]) if x else None)
+    df["longitude"] = df["location"].apply(lambda x: float(x["longitude"]) if x else None)
+    df["street_name"] = df["location"].apply(
+        lambda x: x["street"]["name"] if x and "street" in x else None
+    )
+    df["outcome_category"] = df["outcome_status"].apply(
+        lambda x: x["category"] if x else "Unknown"
+    )
+    df = df.drop(columns=["location", "outcome_status", "context"], errors="ignore")
+    df = df.dropna(subset=["latitude", "longitude"])
+
+    # Cluster
+    coords_scaled = StandardScaler().fit_transform(df[["latitude", "longitude"]].values)
+    df["cluster"] = KMeans(n_clusters=5, random_state=42, n_init=10).fit_predict(coords_scaled)
+
+    # Save for next time
+    DATA_PATH.parent.mkdir(exist_ok=True)
+    df.to_csv(DATA_PATH, index=False)
+
+    return df
+
 # ── Cluster colour palette (matches map markers) ──────────────────────────────
 CLUSTER_COLOURS = {
     0: "#2196F3",  # blue
@@ -28,7 +74,11 @@ CLUSTER_COLOURS = {
 # ── Load data ─────────────────────────────────────────────────────────────────
 @st.cache_data
 def load_data() -> pd.DataFrame:
-    df = pd.read_csv(DATA_PATH)
+    if DATA_PATH.exists():
+        df = pd.read_csv(DATA_PATH)
+    else:
+        with st.spinner("Fetching live data from UK Police API... (first load only, ~30 seconds)"):
+            df = fetch_and_cluster()
     df["month"] = pd.to_datetime(df["month"])
     return df
 
